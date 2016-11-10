@@ -1,0 +1,275 @@
+$iota-tools-core: true;
+
+
+
+
+// Returns the index of a key inside a map
+
+@function _iota-map-index($array, $find) {
+  $index: 0;
+
+  @each $key, $value in $array {
+    @if ($key == $find) {
+      @return $index;
+    }
+
+    $index: $index + 1;
+  }
+
+  @return -1;
+}
+
+
+
+
+// Returns a map1 that contains only the keys of map2
+
+@function _iota-equalize_map($map1, $map2) {
+  @each $key, $value in $map1 {
+
+    @if (map-has-key($map2, $key) == false) {
+
+      $map1: map-remove($map1, $key);
+
+    }
+
+  }
+
+  @return $map1;
+}
+
+
+
+
+// Prefixes breakpoint with the breakpoint generator if breakpoint isn't empty
+
+@function _iota-cast-breakpoint(
+  $breakpoint
+) {
+  @if ($breakpoint != '') {
+    @return #{$iota-global-breakpoint-separator + $breakpoint};
+  }
+
+  @return $breakpoint;
+}
+
+
+
+
+// Generates unit or responsive unit
+
+@mixin _iota-generate-unit(
+  $property,
+  $units) {
+
+  @if (type-of($units) == 'map') {
+
+    @if (map-has-key($units, null)) {
+      #{$property}: map-get($units, null);
+      $units: map-remove($units, null);
+    }
+
+    @each $breakpoint-name, $gutter-size in $units {
+
+      @include _iota-breakpoint($breakpoint-name) {
+        #{$property}: $gutter-size;
+      }
+
+    }
+
+  } @else { #{$property}: $units; }
+}
+
+
+
+
+// Reverses direction
+
+@function _iota-reverse-direction(
+  $direction
+) {
+  $reversables: ('left', 'right');
+
+  @if not index($reversables, $direction) {
+    @return $direction
+  }
+
+  @if ($direction == 'left') {
+    @return right;
+  }
+  
+  @return left;
+}
+
+
+
+
+// Reverses direction if rtl is enabled
+
+@function _iota-direction($direction) {
+  @return if($iota-global-rtl, _iota-reverse-direction($direction), $direction);
+}
+
+
+
+
+// Generates direction properly value based on rtl options
+
+@mixin _iota-direction-property(
+  $property,
+  $direction,
+  $important: true
+) {
+
+  $property-value: _iota-direction($direction) + if($important, ' !important', '');
+
+  #{$property} : #{$property-value};
+}
+
+
+
+
+// Generate Spacing based on spacing options
+
+@mixin _iota-utility-generate-spacing(
+  $spacing-type,
+  $spacing-sizes,
+  $spacing-name: ''
+) {
+  @if (type-of($spacing-sizes) == 'map') {
+    @if (map-has-key($spacing-sizes, null)) {
+      @include _iota-utility-generate-spacing-classes($spacing-type, map-get($spacing-sizes, null), $spacing-name);
+      $spacing-sizes: map-remove($spacing-sizes, null);
+    }
+
+    @each $spacing-breakpoint-name, $spacing-size in $spacing-sizes {
+      @include _iota-breakpoint($spacing-breakpoint-name) {
+        @include _iota-utility-generate-spacing-classes($spacing-type, $spacing-size, $spacing-name);
+      }
+    }
+  } @else {
+    @include _iota-utility-generate-spacing-classes($spacing-type, $spacing-sizes, $spacing-name);
+  }
+}
+
+
+
+
+// Generate Responsive Spacing based on spacing options
+
+@mixin _iota-utility-generate-responsive-spacing(
+  $spacing-type,
+  $spacing-breakpoints,
+  $spacing-sizes,
+  $spacing-name: ''
+) {
+  @if (type-of($spacing-sizes) == 'map') {
+    $iota-breakpoints-temp    : _iota-equalize-map($spacing-breakpoints, $spacing-sizes);
+    $spacing-breakpoints-temp : _iota-equalize_map($spacing-sizes, $spacing-breakpoints);
+
+    @each $iota-breakpoint-name, $iota-breakpoint-size in $iota-breakpoints-temp {
+
+      @each $spacing-breakpoint-name, $spacing-breakpoint-size in $spacing-breakpoints-temp {
+        $iota-breakpoint-index   : _iota-map-index($iota-breakpoints-temp, $iota-breakpoint-name);
+        $spacing-breakpoint-index: _iota-map-index($spacing-breakpoints-temp, $spacing-breakpoint-name);
+
+        @if ($spacing-breakpoint-index >= $iota-breakpoint-index) {
+          @include _iota-breakpoint($spacing-breakpoint-name) {
+            @include _iota-utility-generate-spacing-classes($spacing-type, $spacing-breakpoint-size, $spacing-name, $iota-breakpoint-name);
+          }
+        }
+      }
+    }
+
+  } @else {
+
+    @each $breakpoint-name, $breakpoint-size in $spacing-breakpoints {
+      @media #{$breakpoint-size} {
+        @include _iota-utility-generate-spacing-classes($spacing-type, $spacing-sizes, $spacing-name, $breakpoint-name);
+      }
+    }
+
+  }
+
+}
+
+
+
+
+// Generate Spacing Classes
+
+@mixin _iota-utility-generate-spacing-classes(
+  $spacing-type,
+  $spacing-size,
+  $spacing-name: '',
+  $spacing-breakpoint-name: ''
+) {
+  $spacing-breakpoint-name: _iota-cast-breakpoint($spacing-breakpoint-name);
+
+  @if ($spacing-type == 'margin') {
+    @include _iota-generate-margin-classes($spacing-size, $spacing-name, $spacing-breakpoint-name);
+  } @else {
+    @include _iota-generate-padding-classes($spacing-size, $spacing-name, $spacing-breakpoint-name);
+  }
+}
+
+
+
+
+// Generate Margin Classes
+
+@mixin _iota-generate-margin-classes(
+  $spacing-size,
+  $spacing-name: '',
+  $spacing-breakpoint-name: ''
+) {
+  $property-prefix: $iota-global-utilities-namespace + $iota-utils-margin-namespace;
+
+  .#{$property-prefix + $spacing-name + $spacing-breakpoint-name}                                       { margin                                      : $spacing-size !important; }
+  .#{$property-prefix + $iota-utils-margin-top-name + $spacing-name + $spacing-breakpoint-name}         { margin-top                                  : $spacing-size !important; }
+  .#{$property-prefix + $iota-utils-margin-right-name + $spacing-name + $spacing-breakpoint-name}       { margin-#{_iota-direction('right')}  : $spacing-size !important; }
+  .#{$property-prefix + $iota-utils-margin-bottom-name + $spacing-name + $spacing-breakpoint-name}      { margin-bottom                               : $spacing-size !important; }
+  .#{$property-prefix + $iota-utils-margin-left-name + $spacing-name + $spacing-breakpoint-name}        { margin-#{_iota-direction('left')}   : $spacing-size !important; }
+  .#{$property-prefix + $iota-utils-margin-vertical-name + $spacing-name + $spacing-breakpoint-name}    { margin-top                                  : $spacing-size !important; margin-bottom : $spacing-size !important; }
+  .#{$property-prefix + $iota-utils-margin-horizontal-name + $spacing-name + $spacing-breakpoint-name}  { margin-#{_iota-direction('right')}  : $spacing-size !important; margin-#{_iota-reverse-direction('left')}   : $spacing-size !important; }
+}
+
+
+
+
+// Generate Padding Classes
+
+@mixin _iota-generate-padding-classes(
+  $spacing-size,
+  $spacing-name: '',
+  $spacing-breakpoint-name: ''
+) {
+  $property-prefix: $iota-global-utilities-namespace + $iota-utils-padding-namespace;
+
+  .#{$property-prefix + $spacing-name + $spacing-breakpoint-name}                                       { padding                                       : $spacing-size !important; }
+  .#{$property-prefix + $iota-utils-padding-top-name + $spacing-name + $spacing-breakpoint-name}        { padding-top                                   : $spacing-size !important; }
+  .#{$property-prefix + $iota-utils-padding-right-name + $spacing-name + $spacing-breakpoint-name}      { padding-#{_iota-direction('right')}   : $spacing-size !important; }
+  .#{$property-prefix + $iota-utils-padding-bottom-name + $spacing-name + $spacing-breakpoint-name}     { padding-bottom                                : $spacing-size !important; }
+  .#{$property-prefix + $iota-utils-padding-left-name + $spacing-name + $spacing-breakpoint-name}       { padding-#{_iota-direction('left')}    : $spacing-size !important; }
+  .#{$property-prefix + $iota-utils-padding-vertical-name + $spacing-name + $spacing-breakpoint-name}   { padding-top                                   : $spacing-size !important; padding-bottom : $spacing-size !important; }
+  .#{$property-prefix + $iota-utils-padding-horizontal-name + $spacing-name + $spacing-breakpoint-name} { padding-#{_iota-direction('right')}   : $spacing-size !important; padding-#{_iota-reverse-direction('left')}   : $spacing-size !important; }
+}
+
+
+
+
+// Private iota breakpoint mixin
+
+@mixin _iota-breakpoint($size, $breakpoints: $iota-global-breakpoints) {
+  $breakpoint-found: map-has-key($breakpoints, $size);
+  
+  @if ($breakpoint-found == true) {
+    $breakpoint: map-get($breakpoints, $size);
+
+    @media #{$breakpoint} {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint size " + #{$size} + " doesn't exist."
+  }
+}
