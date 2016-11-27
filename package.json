@@ -1,6 +1,6 @@
 {
   "name": "iotacss-tools-core",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Core tools for iotaCSS",
   "main": "_tools.core.scss",
   "repository": {
