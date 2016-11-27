@@ -1,0 +1,20 @@
+@mixin _iota-spacing-property($size, $suffix, $props...) {
+  $property-prefix: '.' + $iota-global-utilities-namespace + nth($props, 4);
+  $property-suffix: if($suffix, $suffix, '');
+
+  $all    : $property-prefix                    + $property-suffix;
+  $top    : $property-prefix + nth($props, 5)   + $property-suffix;
+  $right  : $property-prefix + nth($props, 6)   + $property-suffix;
+  $bottom : $property-prefix + nth($props, 7)   + $property-suffix;
+  $left   : $property-prefix + nth($props, 8)   + $property-suffix;
+  $ver    : $property-prefix + nth($props, 9)   + $property-suffix;
+  $horz   : $property-prefix + nth($props, 10)  + $property-suffix;
+
+  #{$all}    { @include _iota-directional-property('margin', null, $size) }
+  #{$top}    { @include _iota-directional-property('margin', null, $size null null) }
+  #{$right}  { @include _iota-directional-property('margin', null, null $size null null) }
+  #{$bottom} { @include _iota-directional-property('margin', null, null null $size) }
+  #{$left}   { @include _iota-directional-property('margin', null, null null null $size) }
+  #{$ver}    { @include _iota-directional-property('margin', null, $size null) }
+  #{$horz}   { @include _iota-directional-property('margin', null, null $size) }
+};
