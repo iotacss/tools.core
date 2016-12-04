@@ -11,11 +11,11 @@
   $ver    : $property-prefix + nth($props, 9)   + $property-suffix;
   $horz   : $property-prefix + nth($props, 10)  + $property-suffix;
 
-  #{$all}    { @include _iota-directional-property($property, null, $size) }
-  #{$top}    { @include _iota-directional-property($property, null, $size null null) }
-  #{$right}  { @include _iota-directional-property($property, null, null $size null null) }
-  #{$bottom} { @include _iota-directional-property($property, null, null null $size) }
-  #{$left}   { @include _iota-directional-property($property, null, null null null $size) }
-  #{$ver}    { @include _iota-directional-property($property, null, $size null) }
-  #{$horz}   { @include _iota-directional-property($property, null, null $size) }
+  #{$all}    { @include _iota-directional-property($property, null, $size, true) }
+  #{$top}    { @include _iota-directional-property($property, null, $size null null, true) }
+  #{$right}  { @include _iota-directional-property($property, null, null $size null null, true) }
+  #{$bottom} { @include _iota-directional-property($property, null, null null $size, true) }
+  #{$left}   { @include _iota-directional-property($property, null, null null null $size, true) }
+  #{$ver}    { @include _iota-directional-property($property, null, $size null, true) }
+  #{$horz}   { @include _iota-directional-property($property, null, null $size, true) }
 };
