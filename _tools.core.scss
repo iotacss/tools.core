@@ -14,6 +14,7 @@ $iota-tools-core: true;
 @import './utilities/spacing-property';
 @import './utilities/compact-shorthand';
 @import './utilities/generate-spacing-classes';
+@import './utilities/generate-spacing-responsive-classes';
 
 @import './libraries/generate-unit';
 @import './libraries/generate-spacing';
