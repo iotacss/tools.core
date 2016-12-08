@@ -2,6 +2,7 @@ $iota-tools-core: true;
 
 @import './validators/is-map';
 @import './validators/is-number';
+@import './validators/is-list-child';
 @import './validators/contains-falsy';
 @import './validators/map-contains-null';
 
