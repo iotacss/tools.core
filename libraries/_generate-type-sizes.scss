@@ -1,4 +1,4 @@
-@mixin _iota-generate-type-sizes($values) {
+@mixin _iota-generate-type-sizes($values, $breakpoints) {
 
   @if type-of($values) == 'map' {
 
@@ -10,9 +10,9 @@
   
     @each $breakpoint, $sizes in $values {
 
-      @if map-has-key($iota-global-breakpoints, $breakpoint) {
+      @if map-has-key($breakpoints, $breakpoint) {
       
-        @media #{map-get($iota-global-breakpoints, $breakpoint)} {
+        @media #{map-get($breakpoints, $breakpoint)} {
       
           @include _iota-extract-type-sizes($sizes);
 
